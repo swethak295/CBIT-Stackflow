@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query and Answer Platform</title>
+    <style>
+        * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f7f9fc;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-left: 10px solid #7b1fa2;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #7b1fa2;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.main-content {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap; /* No wrapping for larger screens */
+}
+
+.query-box,
+.answer-box {
+    width: 48%; /* Adjust width for left and right boxes */
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: #3f51b5;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+form label {
+    font-size: 1.2rem;
+    color: #3949ab;
+    font-weight: bold;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #9c27b0;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #6200ea;
+    color: #fff;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #3700b3;
+}
+
+#doubtList {
+    margin-top: 20px;
+}
+
+.doubt-card {
+    background-color: #e1bee7;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 12px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    border-left: 10px solid #9c27b0;
+}
+
+.doubt-card h3 {
+    margin-bottom: 5px;
+    color: #311b92;
+    font-size: 1.2rem;
+}
+
+.doubt-card p {
+    color: #5c6bc0;
+    font-size: 1rem;
+}
+
+.answer-section {
+    background-color: #47e628;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 8px;
+}
+
+.answer-section h4 {
+    color: #000000;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.answer {
+    background-color: #fff9c4;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.answer h5 {
+    color: #410047;
+    font-size: 1rem;
+}
+.answer p {
+    color: #ff00b3;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+.edit-button {
+    background-color: #ff4221;
+    border: none;
+    color: rgb(0, 0, 0);
+    padding: 5px; /* Adjusted padding for a smaller button */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    width: 20%; /* Set width to 20% of the answer box */
+    margin-left: auto; /* Align button to the right */
+}
+.edit-button:hover {
+    background-color: #ff6105;
+}
+hr {
+    border: none;
+    border-top: 2px solid #b39ddb;
+    margin: 10px 0;
+}
+input.editable-input {
+    width: calc(100% - 20px);
+    font-size: 0.9rem;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+/* Responsive Styles */
+@media (max-width: 700px) {
+    .main-content {
+        flex-direction: column; /* Stack items vertically on small screens */
+    }
+    .query-box,
+    .answer-box {
+        width: 100%; /* Full width for mobile */
+    }
+    .answer-box {
+        margin-top: 20px; /* Add spacing for better layout */
+    }
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Query and Answer Platform</h1>
+        <div class="main-content">
+            <div class="query-box">
+                <h2>Query</h2>
+                <form id="queryForm">
+                    <label for="name">Name (Optional):</label>
+                    <input type="text" id="name" placeholder="Enter your name (optional)">
+                    <label for="query">Your Query:</label>
+                    <textarea id="query" rows="4" required placeholder="Enter your query..."></textarea>
+                    <button type="submit">Post Query</button>
+                </form>
+            </div>
+            <div class="answer-box">
+                <h2>Answers</h2>
+                <div id="doubtList"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+       document.getElementById('queryForm').addEventListener('submit', function (e) {
+    e.preventDefault(); // Prevent the form from submitting and refreshing the page
+    const name = document.getElementById('name').value; // Get the name input
+    const queryText = document.getElementById('query').value; // Get the query input
+    // Check if the query is filled
+    if (queryText.trim() !== "") {
+        addQuery(name, queryText); // Call function to add the query
+    }
+    // Clear form after submission
+    document.getElementById('name').value = "";
+    document.getElementById('query').value = "";
+});
+// Function to add a query to the list
+function addQuery(name, queryText) {
+    const doubtList = document.getElementById('doubtList'); // Get the list of doubts
+    // Create a new doubt card
+    const doubtCard = document.createElement('div');
+    doubtCard.classList.add('doubt-card');
+    // Create the heading for the query
+    const queryHeading = document.createElement('h3');
+    queryHeading.innerHTML = `Query :<br> ${name ? name : 'Anonymous'} : ${queryText}`;
+    doubtCard.appendChild(queryHeading); // Append the heading to the doubt card
+    // Create the answer section
+    const answerSection = document.createElement('div');
+    answerSection.classList.add('answer-section');
+    // Create heading for answers
+    const answersHeading = document.createElement('h4');
+    answersHeading.textContent = "Answers"; // Set heading for answers
+    answerSection.appendChild(answersHeading);
+    // Create a form for submitting answers
+    const answerForm = document.createElement('form');
+    // Create an input field for the answering person's name
+    const answerNameInput = document.createElement('input');
+    answerNameInput.type = "text";
+    answerNameInput.placeholder = "Your Name (Optional)"; // Placeholder for the name input
+    // Create an input field for the answer
+    const answerInput = document.createElement('input');
+    answerInput.type = "text";
+    answerInput.placeholder = "Answer here"; // Placeholder for the answer input
+    // Create a button to submit the answer
+    const answerButton = document.createElement('button');
+    answerButton.type = "button"; // Set to button to prevent form submission
+    answerButton.textContent = "Submit Answer"; // Set button text
+    // Handle answer submission
+    answerButton.addEventListener('click', function () {
+        const answerText = answerInput.value.trim(); // Get the trimmed answer text
+        const answerName = answerNameInput.value.trim(); // Get the trimmed name
+        if (answerText) {
+            addAnswer(answerSection, answerName, answerText); // Call function to add the answer
+            answerInput.value = ""; // Clear the answer input
+            answerNameInput.value = ""; // Clear the name input
+        }
+    });
+    // Append name input, answer input, and button to the form
+    answerForm.appendChild(answerNameInput);
+    answerForm.appendChild(answerInput);
+    answerForm.appendChild(answerButton);
+    answerSection.appendChild(answerForm); // Append the form to the answer section
+    // Append the answer section to the doubt card
+    doubtCard.appendChild(answerSection);
+    doubtList.appendChild(doubtCard); // Append the doubt card to the list of doubts
+}
+// Function to add an answer to a specific query
+function addAnswer(answerSection, answerName, answerText) {
+    // Create an answer box
+    const answerBox = document.createElement('div');
+    answerBox.classList.add('answer');
+    // Create a heading for the person answering
+    const answerPerson = document.createElement('h5');
+    answerPerson.textContent = `${answerName ? answerName : 'Anonymous'} :`; // Set the person's name
+    // Create a paragraph for the answer text
+    const answerContent = document.createElement('p');
+    answerContent.textContent = answerText; // Set the text for the answer
+    // Create an edit button
+    const editButton = document.createElement('button');
+    editButton.classList.add('edit-button');
+    editButton.textContent = "Edit"; // Set button text to Edit 
+    // Handle editing functionality
+    editButton.addEventListener('click', function () {
+        if (editButton.textContent === "Edit") {
+            // When Edit is clicked, replace answer content with an input field
+            const inputField = document.createElement('input');
+            inputField.classList.add('editable-input');
+            inputField.type = "text";
+            inputField.value = answerContent.textContent; // Set input value to the current answer
+            answerBox.replaceChild(inputField, answerContent); // Replace answer content with input field
+            editButton.textContent = "Save"; // Change button text to Save
+        } else {
+            // When Save is clicked, update the answer content
+            const inputField = answerBox.querySelector('.editable-input'); // Get the input field
+            answerContent.textContent = inputField.value; // Update the answer content with the input value
+
+            answerBox.replaceChild(answerContent, inputField); // Replace input field with updated answer content
+            editButton.textContent = "Edit"; // Change button text back to Edit
+        }
+    });
+    // Append elements to the answer box
+    answerBox.appendChild(answerPerson); // Append the person's name
+    answerBox.appendChild(answerContent); // Append the answer content
+    answerBox.appendChild(editButton); // Append the edit button
+    answerSection.appendChild(answerBox); // Append the answer box to the answer section
+    // Add a horizontal line between answers for separation
+    const divider = document.createElement('hr');
+    answerSection.appendChild(divider); // Append the divider to the answer section
+}
+    </script>
+</body>
+</html>
